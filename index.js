@@ -1,24 +1,24 @@
 require('dotenv').config();
 const express = require('express');
-const fetch = require('node-fetch'); // اگر Node.js 18+ داری، fetch داخلی هست
+const fetch = require('node-fetch'); // در Node 18 به بعد می‌تونی اینو حذف کنی
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// مسیر صحیح به فولدر public (یک سطح بالاتر)
-app.use(express.static(path.join(__dirname, '../public')));
+// استفاده از پوشه public به عنوان فایل استاتیک
+app.use(express.static(path.join(__dirname, 'public')));
 
-// اطمینان از نمایش index.html روی /
+// صفحه اصلی
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// مسیر تست سرور
+// مسیر تست
 app.get('/api/test', (req, res) => {
     res.json({ message: "سرور Express شما آماده است!" });
 });
 
-// اینستاگرام API
+// API اینستاگرام
 app.get('/api/instagram', async (req, res) => {
     const token = process.env.INSTAGRAM_ACCESS_TOKEN;
     const userId = process.env.INSTAGRAM_USER_ID;
@@ -31,7 +31,7 @@ app.get('/api/instagram', async (req, res) => {
     }
 });
 
-// یوتیوب API
+// API یوتیوب
 app.get('/api/youtube', async (req, res) => {
     const apiKey = process.env.YOUTUBE_API_KEY;
     const channelId = process.env.YOUTUBE_CHANNEL_ID;
@@ -44,7 +44,6 @@ app.get('/api/youtube', async (req, res) => {
     }
 });
 
-// اجرا روی پورت مشخص
 app.listen(PORT, () => {
     console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
 });
