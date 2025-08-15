@@ -5,14 +5,13 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// مسیر درست به فولدر public
+// مسیر صحیح به فولدر public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// مسیر اصلی سایت
+// نمایش index.html روی /
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
 
 // مسیر تست سرور
 app.get('/api/test', (req, res) => {
@@ -49,3 +48,4 @@ app.get('/api/youtube', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
 });
+
