@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const fetch = require('node-fetch'); // اگر Node.js 18+ داری، fetch داخلی هست
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,4 +47,3 @@ app.get('/api/youtube', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
 });
-
