@@ -433,12 +433,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // دریافت داده‌ها از سرور امن و ساخت JSON-LD حرفه‌ای
 // =========================
 async function loadMediaData() {
-    const instaRes = await fetch('/api/instagram');
-    const instaData = await instaRes.json();
-
-    const ytRes = await fetch('/api/youtube');
-    const ytData = await ytRes.json();
-
+    const res = await fetch('/api/media');
+    const data = await res.json();
+    const instaData = data.instagram;
+    const ytData = data.youtube;
     // پاک کردن گالری‌ها قبل از اضافه کردن
     const instaGallery = document.querySelector('.instagram-gallery');
     const ytGallery = document.querySelector('.youtube-gallery');
@@ -524,4 +522,5 @@ async function loadMediaData() {
 </script>
 </body>
 </html>
+
 
