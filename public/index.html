@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+درست هست <!DOCTYPE html>
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
@@ -94,46 +94,6 @@ header h1 {
 }
 
 /* =========================
-   Swiper اسلایدر
-========================= */
-.swiper-slide {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  will-change: transform;
-}
-.swiper-slide:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-}
-.swiper-slide img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-.swiper-slide:hover img {
-  transform: scale(1.05);
-}
-.swiper-slide .overlay-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 2rem;
-  color: #fff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
-}
-.swiper-slide p {
-  padding: 10px;
-  font-size: clamp(0.8rem,1vw+0.5rem,1rem);
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
-}
-
-/* =========================
    گرید واکنش‌گرا برای کارت‌ها
 ========================= */
 .grid {
@@ -146,33 +106,21 @@ header h1 {
 @media (max-width: 767px) { .grid { grid-template-columns: repeat(2,1fr); } }
 
 /* =========================
-   کارت‌های رسانه
+   Hover و افکت حرفه‌ای Swiper و Media-Card
 ========================= */
-.media-card {
-  background: rgba(0,0,0,0.4);
-  border-radius: 12px;
+.swiper-slide {
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  will-change: transform;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.swiper-slide:hover {
+  transform: scale(1.08) rotateY(5deg);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
 }
 .media-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-}
-.media-card img {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-.media-card:hover img { transform: scale(1.05); }
-.media-card p {
-  padding: 15px;
-  font-size: clamp(0.8rem,1vw+0.5rem,1rem);
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.7);
 }
 
 /* =========================
@@ -242,8 +190,9 @@ footer {
 <body>
 
 <div class="video-background">
-  <video class="lazy-video" muted loop playsinline poster="media/background.mp4">
-    <source data-src="media/background.mp4" type="video/mp4">
+  <video autoplay muted loop playsinline>
+    <source src="media/background.mp4" type="video/mp4">
+    مرورگر شما از ویدیو پشتیبانی نمی‌کند.
   </video>
   <div class="overlay"></div>
 </div>
@@ -324,33 +273,37 @@ function getCache(key) {
 /* =========================
    ایجاد Swiper با breakpoints
 ========================= */
-function createSwiper(selector, breakpoints) {
-    return new Swiper(selector, {
-        slidesPerView: 1,
-        spaceBetween: 15,
-        loop: true,
-        navigation: {
-            nextEl: `${selector} .swiper-button-next`,
-            prevEl: `${selector} .swiper-button-prev`
-        },
-        breakpoints,
-        lazy: true
-    });
+function createProSwiper(selector) {
+  return new Swiper(selector, {
+    slidesPerView: 1,
+    spaceBetween: 20,
+    loop: true,
+    effect: 'coverflow',
+    coverflowEffect: {
+      rotate: 30,
+      stretch: 0,
+      depth: 150,
+      modifier: 1,
+      slideShadows: true,
+    },
+    navigation: {
+      nextEl: `${selector} .swiper-button-next`,
+      prevEl: `${selector} .swiper-button-prev`
+    },
+    breakpoints: {
+      0: { slidesPerView: 3 },
+      768: { slidesPerView: 4 },
+      1024: { slidesPerView: 5 },
+    },
+    lazy: true,
+    grabCursor: true,
+    centeredSlides: true,
+    speed: 800
+  });
 }
 
-const instaSwiper = createSwiper('.instagram-swiper', {
-    768: { slidesPerView: 2 },
-    1024: { slidesPerView: 3 },
-    1200: { slidesPerView: 4 },
-    1400: { slidesPerView: 5 }
-});
-
-const ytSwiper = createSwiper('.youtube-swiper', {
-    768: { slidesPerView: 2 },
-    1024: { slidesPerView: 3 },
-    1200: { slidesPerView: 4 },
-    1400: { slidesPerView: 5 }
-});
+const instaSwiper = createProSwiper('.instagram-swiper');
+const ytSwiper = createProSwiper('.youtube-swiper');
 
 /* =========================
    ایجاد کارت‌ها
@@ -469,72 +422,105 @@ function generateJSONLD(instaData, ytData) {
     }
 }
 
+/* =========================
+   اجرا در DOMContentLoaded
+========================= */
+document.addEventListener('DOMContentLoaded', () => {
+    loadMediaData();
+    lazyLoadVideos('video.lazy-video'); // اگر ویدیو دارید
+});
 // =========================
-// دریافت داده‌ها از سرور امن
+// دریافت داده‌ها از سرور امن و ساخت JSON-LD حرفه‌ای
 // =========================
-async function loadInstagram() {
-    const res = await fetch('/api/instagram');
-    const data = await res.json();
+async function loadMediaData() {
+    const instaRes = await fetch('/api/instagram');
+    const instaData = await instaRes.json();
 
-    data.data.forEach(item => {
+    const ytRes = await fetch('/api/youtube');
+    const ytData = await ytRes.json();
+
+    // پاک کردن گالری‌ها قبل از اضافه کردن
+    const instaGallery = document.querySelector('.instagram-gallery');
+    const ytGallery = document.querySelector('.youtube-gallery');
+    instaGallery.innerHTML = '';
+    ytGallery.innerHTML = '';
+
+    // آرایه‌ها برای JSON-LD
+    const instagramPosts = [];
+    const youtubeVideos = [];
+
+    // اضافه کردن عکس‌ها و جمع‌آوری برای JSON-LD
+    (instaData.data || []).forEach(item => {
         const img = document.createElement('img');
         img.src = item.media_url;
         img.alt = item.caption || "پست اینستاگرام ابوالفضل شهاب";
-        document.querySelector('.instagram-gallery').appendChild(img);
+        instaGallery.appendChild(img);
 
-        // JSON-LD برای گوگل
-        const script = document.createElement('script');
-        script.type = "application/ld+json";
-        script.textContent = JSON.stringify({
-            "@context": "https://schema.org",
+        instagramPosts.push({
             "@type": "ImageObject",
-            "contentUrl": item.media_url,
-            "description": item.caption,
-            "author": "ivan.omgru"
+            "name": (item.caption?.slice(0,80) || "") + "… - پست اینستاگرام ابوالفضل شهاب",
+            "url": item.permalink,
+            "contentUrl": item.media_url
         });
-        document.head.appendChild(script);
     });
-}
 
-async function loadYouTube() {
-    const res = await fetch('/api/youtube');
-    const data = await res.json();
-
-    data.items.forEach(item => {
+    // اضافه کردن ویدیوها و جمع‌آوری برای JSON-LD
+    (ytData.items || []).forEach(item => {
         const videoLink = `https://www.youtube.com/watch?v=${item.id.videoId}`;
         const thumb = item.snippet.thumbnails.high.url;
 
         const img = document.createElement('img');
         img.src = thumb;
         img.alt = item.snippet.title || "ویدیو یوتیوب ابوالفضل شهاب";
-        document.querySelector('.youtube-gallery').appendChild(img);
+        ytGallery.appendChild(img);
 
-        // JSON-LD برای گوگل
-        const script = document.createElement('script');
-        script.type = "application/ld+json";
-        script.textContent = JSON.stringify({
-            "@context": "https://schema.org",
+        youtubeVideos.push({
             "@type": "VideoObject",
-            "name": item.snippet.title,
+            "name": item.snippet.title.slice(0,80) + "… - ویدیو یوتیوب ابوالفضل شهاب",
+            "url": videoLink,
             "thumbnailUrl": thumb,
             "uploadDate": item.snippet.publishedAt,
-            "contentUrl": videoLink,
-            "author": "ivan.omgru"
+            "publisher": {
+                "@type": "Person",
+                "name": "ابوالفضل شهاب",
+                "alternateName": "Абульфазль Шахаб",
+                "url": "https://ivan.omgru.ir/"
+            }
         });
-        document.head.appendChild(script);
     });
-}
 
-/* =========================
-   اجرا در DOMContentLoaded
-========================= */
-document.addEventListener('DOMContentLoaded', () => {
-    loadInstagram();
-    loadYouTube();
-    lazyLoadVideos('video.lazy-video');
-});
+    // ساخت JSON-LD نهایی
+    const jsonLD = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Person",
+                "name": "ابوالفضل شهاب",
+                "alternateName": "Абульфазль Шахаб",
+                "url": "https://ivan.omgru.ir/",
+                "sameAs": [
+                    "https://www.instagram.com/ivan.omgru/",
+                    "https://www.youtube.com/@ivanomgru"
+                ],
+                "image": "https://media.ivan.omgru.ir/images/profile.jpg",
+                "jobTitle": "مدرس زبان روسی، طراح سایت، تولیدکننده محتوا",
+                "description": "آخرین پست‌های اینستاگرام و ویدیوهای یوتیوب ابوالفضل شهاب | ivan.omgru | Иван омгру"
+            },
+            ...instagramPosts,
+            ...youtubeVideos
+        ]
+    };
+
+    // اضافه کردن یا به‌روز رسانی script JSON-LD
+    let scriptTag = document.head.querySelector('script[type="application/ld+json"]');
+    if (!scriptTag) {
+        scriptTag = document.createElement('script');
+        scriptTag.type = 'application/ld+json';
+        document.head.appendChild(scriptTag);
+    }
+    scriptTag.textContent = JSON.stringify(jsonLD, null, 2);
+}
 
 </script>
 </body>
 </html>
-
