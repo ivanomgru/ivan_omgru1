@@ -16,7 +16,7 @@
 <meta property="og:description" content="آخرین پست‌های اینستاگرام و ویدیوهای یوتیوب ابوالفضل شهاب | ivan.omgru | Иван омгру">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ivan.omgru.ir/">
-<meta property="og:image" content="https://media.ivan.omgru.ir/images/profile.jpg">
+<meta property="og:image" content="https://media.ivan.omgru.ir/images/logo.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="آخرین پست‌های ابوالفضل شهاب | ivan.omgru | Иван омгру">
 <meta name="twitter:description" content="آخرین پست‌های اینستاگرام و ویدیوهای یوتیوب ابوالفضل شهاب | ivan.omgru | Иван омгру">
@@ -26,6 +26,8 @@
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Vazir&display=swap" as="style">
 <!-- Swiper CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazir&display=swap">
+
 <!-- JSON-LD دو زبانه -->
 <style>
 /* =========================
@@ -240,8 +242,8 @@ footer {
 <body>
 
 <div class="video-background">
-  <video autoplay muted loop playsinline>
-    <source src="media/background.mp4" type="video/mp4">
+  <video class="lazy-video" muted loop playsinline poster="media/background-poster.jpg">
+    <source data-src="media/background.mp4" type="video/mp4">
   </video>
   <div class="overlay"></div>
 </div>
@@ -274,15 +276,17 @@ footer {
 
   <h2 class="section-title lang-fa">تمام پست‌ها و ویدیوها</h2>
   <h2 class="section-title lang-ru">Все посты и видео</h2>
-  <div class="grid instagram-gallery youtube-gallery"></div>
+  <div class="grid instagram-gallery"></div>
+  <div class="grid youtube-gallery"></div>
+
 </div>
 
 <footer>
   <span class="lang-fa">© 2025 ابوالفضل شهاب | ivan.omgru | Иван омгру</span>
   <span class="lang-ru">© 2025 Абульфазль Шахаб | ivan.omgru | Иван омгру</span>
 </footer>
-
 <!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script>
 /* =========================
    مدیریت زبان دو زبانه با افکت
@@ -408,114 +412,6 @@ function lazyLoadVideos(selector) {
 }
 
 /* =========================
-   اینستاگرام API
-========================= */
-const instaConfig = {
-    accessToken: "YOUR_INSTAGRAM_GRAPH_API_TOKEN",
-    userId: "YOUR_INSTAGRAM_USER_ID",
-    limit: 6,
-    next: null
-};
-
-async function loadInstagram(limit = instaConfig.limit) {
-    try {
-        let data = getCache('instagramData');
-        if(!data) {
-            let url = `https://graph.instagram.com/${instaConfig.userId}/media?fields=id,caption,media_url,permalink&access_token=${instaConfig.accessToken}&limit=${limit}`;
-            if(instaConfig.next) url = instaConfig.next;
-            const res = await fetch(url);
-            data = await res.json();
-            setCache('instagramData', data);
-        }
-
-        const carousel = document.querySelector(".instagram-carousel");
-        const grid = document.querySelector(".instagram-gallery");
-        const fragCarousel = document.createDocumentFragment();
-        const fragGrid = document.createDocumentFragment();
-
-        data.data.forEach(item => {
-            const captionFa = ((item.caption || "").slice(0,80)+"…") + " - پست اینستاگرام ابوالفضل شهاب";
-            const captionRu = ((item.caption || "").slice(0,80)+"…") + " - Instagram пост Абульфазля Шахаба";
-
-            const tempSlide = document.createElement('div');
-            tempSlide.innerHTML = createSlideCard(item.permalink, item.media_url, captionFa, captionRu, "📸");
-            fragCarousel.appendChild(tempSlide.firstElementChild);
-
-            const tempCard = document.createElement('div');
-            tempCard.innerHTML = createGridCard(item.permalink, item.media_url, captionFa, captionRu);
-            fragGrid.appendChild(tempCard.firstElementChild);
-        });
-
-        carousel.appendChild(fragCarousel);
-        grid.appendChild(fragGrid);
-
-        lazyLoad('img.lazy');
-        instaConfig.next = data.paging?.next || null;
-        instaSwiper.update();
-
-        globalInstaData = data; // ذخیره برای JSON-LD
-        generateJSONLD(globalInstaData, globalYTData);
-
-    } catch (err) {
-        console.error("Instagram API Error:", err);
-    }
-}
-
-/* =========================
-   YouTube API
-========================= */
-const ytConfig = {
-    apiKey: "YOUR_YOUTUBE_API_KEY",
-    channelId: "YOUR_YOUTUBE_CHANNEL_ID",
-    limit: 6
-};
-
-async function loadYouTube(pageToken = "") {
-    try {
-        let data = getCache('youtubeData');
-        if(!data) {
-            let url = `https://www.googleapis.com/youtube/v3/search?key=${ytConfig.apiKey}&channelId=${ytConfig.channelId}&part=snippet&order=date&maxResults=${ytConfig.limit}`;
-            if(pageToken) url += "&pageToken=" + pageToken;
-            const res = await fetch(url);
-            data = await res.json();
-            setCache('youtubeData', data);
-        }
-
-        const carousel = document.querySelector(".youtube-carousel");
-        const grid = document.querySelector(".youtube-gallery");
-        const fragCarousel = document.createDocumentFragment();
-        const fragGrid = document.createDocumentFragment();
-
-        data.items.forEach(item => {
-            const thumb = item.snippet.thumbnails.high.url;
-            const titleFa = item.snippet.title.slice(0,80) + "… - ویدیو یوتیوب ابوالفضل شهاب";
-            const titleRu = item.snippet.title.slice(0,80) + "… - видео YouTube Абульфазля Шахаба";
-            const link = `https://www.youtube.com/watch?v=${item.id.videoId}`;
-
-            const tempSlide = document.createElement('div');
-            tempSlide.innerHTML = createSlideCard(link, thumb, titleFa, titleRu, "🎬");
-            fragCarousel.appendChild(tempSlide.firstElementChild);
-
-            const tempCard = document.createElement('div');
-            tempCard.innerHTML = createGridCard(link, thumb, titleFa, titleRu);
-            fragGrid.appendChild(tempCard.firstElementChild);
-        });
-
-        carousel.appendChild(fragCarousel);
-        grid.appendChild(fragGrid);
-
-        lazyLoad('img.lazy');
-        ytSwiper.update();
-
-        globalYTData = data; // ذخیره برای JSON-LD
-        generateJSONLD(globalInstaData, globalYTData);
-
-    } catch (err) {
-        console.error("YouTube API Error:", err);
-    }
-}
-
-/* =========================
    JSON-LD اتوماتیک دو زبانه
 ========================= */
 function generateJSONLD(instaData, ytData) {
@@ -573,14 +469,6 @@ function generateJSONLD(instaData, ytData) {
     }
 }
 
-/* =========================
-   اجرا در DOMContentLoaded
-========================= */
-document.addEventListener('DOMContentLoaded', () => {
-    loadInstagram();
-    loadYouTube();
-    lazyLoadVideos('video.lazy-video');
-});
 // =========================
 // دریافت داده‌ها از سرور امن
 // =========================
@@ -637,11 +525,15 @@ async function loadYouTube() {
     });
 }
 
-// اجرا
+/* =========================
+   اجرا در DOMContentLoaded
+========================= */
 document.addEventListener('DOMContentLoaded', () => {
     loadInstagram();
     loadYouTube();
+    lazyLoadVideos('video.lazy-video');
 });
+
 </script>
 </body>
 </html>
