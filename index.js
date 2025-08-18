@@ -1,52 +1,47 @@
 // index.js
-require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
+const fetch = require('node-fetch'); // نسخه 2
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// مسیر درست فولدر public
-app.use(express.static(path.join(__dirname, 'public')));
+// Middleware سبک
+app.use(express.json());
 
 // روت اصلی
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.send('🎉 سرور ivan_omgru1 فعال است!');
 });
 
-// مسیر تست
-app.get('/api/test', (req, res) => {
-    res.json({ message: "سرور Express شما آماده است!" });
+// روت مانیتورینگ سبک
+app.get('/api/status', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// اینستاگرام API
-app.get('/api/instagram', async (req, res) => {
-    const token = process.env.INSTAGRAM_ACCESS_TOKEN;
-    const userId = process.env.INSTAGRAM_USER_ID;
-    try {
-        const response = await fetch(`https://graph.instagram.com/${userId}/media?fields=id,caption,media_url,permalink&access_token=${token}&limit=6`);
-        const data = await response.json();
-        res.json(data);
-    } catch (err) {
-        res.status(500).json({ error: "خطا در دریافت داده‌های اینستاگرام", details: err.message });
-    }
+// نمونه fetch با تایم‌اوت کوتاه
+app.get('/api/test', async (req, res) => {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5 ثانیه
+    const response = await fetch('https://jsonplaceholder.typicode.com/todos/1', { signal: controller.signal });
+    clearTimeout(timeout);
+    const data = await response.json();
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Fetch error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
-// یوتیوب API
-app.get('/api/youtube', async (req, res) => {
-    const apiKey = process.env.YOUTUBE_API_KEY;
-    const channelId = process.env.YOUTUBE_CHANNEL_ID;
-    try {
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&order=date&maxResults=6`);
-        const data = await response.json();
-        res.json(data);
-    } catch (err) {
-        res.status(500).json({ error: "خطا در دریافت داده‌های یوتیوب", details: err.message });
-    }
+// مدیریت ساده 404
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
 });
 
-// شروع سرور
-app.listen(PORT, () => {
-    console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
+// مدیریت خطای داخلی
+app.use((err, req, res, next) => {
+  console.error('Server error:', err.message);
+  res.status(500).json({ error: 'Internal server error' });
 });
+
+// پورت از Render یا fallback 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 سرور روی پورت ${PORT} اجرا شد`));
