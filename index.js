@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/test', (req, res) => {
-    res.json({ message: "سرور Express شما آماده است!" });
+    res.json({ message: "سرور Express آماده است!" });
 });
 
 app.get('/api/instagram', async (req, res) => {
