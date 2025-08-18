@@ -1,3 +1,4 @@
+// index.js
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -6,15 +7,15 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// مسیر صحیح به فولدر public
+// مسیر درست فولدر public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// نمایش index.html روی /
+// روت اصلی
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// مسیر تست سرور
+// مسیر تست
 app.get('/api/test', (req, res) => {
     res.json({ message: "سرور Express شما آماده است!" });
 });
@@ -45,6 +46,7 @@ app.get('/api/youtube', async (req, res) => {
     }
 });
 
+// شروع سرور
 app.listen(PORT, () => {
     console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
 });
