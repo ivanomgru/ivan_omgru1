@@ -1,14 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const fetch = require('node-fetch'); // اضافه شد
+const fetch = require('node-fetch'); // مهم: نسخه 2
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// مسیر صحیح به فولدر public
+// فولدر public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// نمایش index.html روی /
+// نمایش index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -44,6 +44,7 @@ app.get('/api/youtube', async (req, res) => {
     }
 });
 
+// سرور را اجرا کن
 app.listen(PORT, () => {
     console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
 });
