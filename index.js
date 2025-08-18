@@ -1,19 +1,25 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const fetch = require('node-fetch'); // نسخه 2
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// مسیر صحیح به فولدر public
 app.use(express.static(path.join(__dirname, 'public')));
+
+// نمایش index.html روی /
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// مسیر تست سرور
 app.get('/api/test', (req, res) => {
-    res.json({ message: "سرور Express آماده است!" });
+    res.json({ message: "سرور Express شما آماده است!" });
 });
 
+// اینستاگرام API
 app.get('/api/instagram', async (req, res) => {
     const token = process.env.INSTAGRAM_ACCESS_TOKEN;
     const userId = process.env.INSTAGRAM_USER_ID;
@@ -26,6 +32,7 @@ app.get('/api/instagram', async (req, res) => {
     }
 });
 
+// یوتیوب API
 app.get('/api/youtube', async (req, res) => {
     const apiKey = process.env.YOUTUBE_API_KEY;
     const channelId = process.env.YOUTUBE_CHANNEL_ID;
