@@ -1,32 +1,34 @@
 {
-  "name": "ivan_omgru1",
+  "name": "ivan-backend",
   "version": "1.0.0",
-  "description": "High-performance Node.js server optimized for Render Free plan",
+  "description": "Backend API for Ivan's site — Instagram & YouTube integration",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "node-fetch": "^2.6.7",
-    "bcryptjs": "^2.4.3",
-    "dotenv": "^16.3.1",
-    "compression": "^1.7.4",
-    "morgan": "^1.10.0",
-    "cors": "^2.8.5"
-  },
   "engines": {
-    "node": ">=18.x"
+    "node": ">=18.0.0"
   },
   "keywords": [
-    "node",
     "express",
+    "api",
+    "instagram",
+    "youtube",
     "render",
-    "server",
-    "free-plan",
-    "optimized"
+    "backend"
   ],
   "author": "Russ",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "type": "module"
 }

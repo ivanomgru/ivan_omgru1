@@ -1,70 +1,48 @@
+require('dotenv').config();
 const express = require('express');
-const fetch = require('node-fetch'); // نسخه 2
-const bcrypt = require('bcryptjs');
-const dotenv = require('dotenv');
-
-// 📦 ماژول‌های بهینه‌ساز
-const compression = require('compression');
-const morgan = require('morgan');
-const cors = require('cors');
-
-dotenv.config();
-
+const path = require('path');
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// ===== Middleware =====
-app.use(express.json());
-app.use(cors());               // حل مشکل CORS
-app.use(compression());        // کاهش حجم پاسخ‌ها
-app.use(morgan('tiny'));       // لاگ سبک
+// مسیر صحیح به فولدر public
+app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== کش داخلی =====
-let cache = { data: null, time: 0 };
-const CACHE_TTL = 60000; // 1 دقیقه
-
-// تست سرور
+// نمایش index.html روی /
 app.get('/', (req, res) => {
-    res.send('🚀 Server is running on Render Free!');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// تست bcrypt امن
-app.post('/api/hash', (req, res) => {
-    const { password } = req.body;
-
-    if (!password) {
-        return res.status(400).json({ error: 'Password is required' });
-    }
-
-    try {
-        const saltRounds = 10;
-        const hashed = bcrypt.hashSync(password, saltRounds);
-        res.json({ hashed });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+// مسیر تست سرور
+app.get('/api/test', (req, res) => {
+    res.json({ message: "سرور Express شما آماده است!" });
 });
 
-// تست fetch با کش داخلی
-app.get('/api/fetch', async (req, res) => {
+// اینستاگرام API
+app.get('/api/instagram', async (req, res) => {
+    const token = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const userId = process.env.INSTAGRAM_USER_ID;
     try {
-        // استفاده از کش اگر معتبر باشد
-        if (cache.data && Date.now() - cache.time < CACHE_TTL) {
-            return res.json(cache.data);
-        }
-
-        const response = await fetch('https://api.github.com/');
+        const response = await fetch(`https://graph.instagram.com/${userId}/media?fields=id,caption,media_url,permalink&access_token=${token}&limit=6`);
         const data = await response.json();
-
-        // ذخیره در کش
-        cache = { data, time: Date.now() };
         res.json(data);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "خطا در دریافت داده‌های اینستاگرام", details: err.message });
     }
 });
 
-// پورت Render Free
-const PORT = process.env.PORT || 10000;
+// یوتیوب API
+app.get('/api/youtube', async (req, res) => {
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    const channelId = process.env.YOUTUBE_CHANNEL_ID;
+    try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&order=date&maxResults=6`);
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: "خطا در دریافت داده‌های یوتیوب", details: err.message });
+    }
+});
+
 app.listen(PORT, () => {
-    console.log(`🚀 سرور روی پورت ${PORT} اجرا شد`);
+    console.log(`سرور روی http://localhost:${PORT} اجرا شد`);
 });
