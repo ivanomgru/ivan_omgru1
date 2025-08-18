@@ -1,47 +1,48 @@
-// index.js
 const express = require('express');
 const fetch = require('node-fetch'); // نسخه 2
-const app = express();
+const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv');
 
-// Middleware سبک
+dotenv.config();
+
+const app = express();
 app.use(express.json());
 
-// روت اصلی
+// تست سرور
 app.get('/', (req, res) => {
-  res.send('🎉 سرور ivan_omgru1 فعال است!');
+    res.send('Server is running on Render Free!');
 });
 
-// روت مانیتورینگ سبک
-app.get('/api/status', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// تست bcrypt امن
+app.post('/api/hash', (req, res) => {
+    const { password } = req.body;
+
+    if (!password) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
+
+    try {
+        const saltRounds = 10;
+        const hashed = bcrypt.hashSync(password, saltRounds);
+        res.json({ hashed });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// نمونه fetch با تایم‌اوت کوتاه
-app.get('/api/test', async (req, res) => {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5 ثانیه
-    const response = await fetch('https://jsonplaceholder.typicode.com/todos/1', { signal: controller.signal });
-    clearTimeout(timeout);
-    const data = await response.json();
-    res.json({ success: true, data });
-  } catch (err) {
-    console.error('Fetch error:', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
+// تست fetch
+app.get('/api/fetch', async (req, res) => {
+    try {
+        const response = await fetch('https://api.github.com/');
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// مدیریت ساده 404
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// پورت Render Free
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+    console.log(`🚀 سرور روی پورت ${PORT} اجرا شد`);
 });
-
-// مدیریت خطای داخلی
-app.use((err, req, res, next) => {
-  console.error('Server error:', err.message);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-// پورت از Render یا fallback 3000
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 سرور روی پورت ${PORT} اجرا شد`));
