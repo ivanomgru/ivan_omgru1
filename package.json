@@ -1,15 +1,32 @@
 {
   "name": "ivan_omgru1",
   "version": "1.0.0",
-  "description": "Professional Render Free Node.js server",
+  "description": "High-performance Node.js server optimized for Render Free plan",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "node-fetch": "^2.6.7",
     "bcryptjs": "^2.4.3",
-    "dotenv": "^16.3.1"
-  }
+    "dotenv": "^16.3.1",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "render",
+    "server",
+    "free-plan",
+    "optimized"
+  ],
+  "author": "Russ",
+  "license": "MIT"
 }
