@@ -3,10 +3,10 @@ const fetch = require('node-fetch'); // نسخه 2
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 
-// 📦 ماژول‌های بهینه‌سازی برای Render Free
-const compression = require('compression'); // فشرده‌سازی پاسخ‌ها
-const morgan = require('morgan');           // لاگ سبک
-const cors = require('cors');               // حل مشکل CORS
+// 📦 ماژول‌های بهینه‌ساز
+const compression = require('compression');
+const morgan = require('morgan');
+const cors = require('cors');
 
 dotenv.config();
 
@@ -14,13 +14,13 @@ const app = express();
 
 // ===== Middleware =====
 app.use(express.json());
-app.use(cors());
-app.use(compression());
-app.use(morgan('tiny'));
+app.use(cors());               // حل مشکل CORS
+app.use(compression());        // کاهش حجم پاسخ‌ها
+app.use(morgan('tiny'));       // لاگ سبک
 
-// ===== کش ساده داخلی =====
+// ===== کش داخلی =====
 let cache = { data: null, time: 0 };
-const CACHE_TTL = 60000; // یک دقیقه
+const CACHE_TTL = 60000; // 1 دقیقه
 
 // تست سرور
 app.get('/', (req, res) => {
@@ -47,7 +47,7 @@ app.post('/api/hash', (req, res) => {
 // تست fetch با کش داخلی
 app.get('/api/fetch', async (req, res) => {
     try {
-        // استفاده از کش اگر هنوز معتبر است
+        // استفاده از کش اگر معتبر باشد
         if (cache.data && Date.now() - cache.time < CACHE_TTL) {
             return res.json(cache.data);
         }
@@ -57,7 +57,6 @@ app.get('/api/fetch', async (req, res) => {
 
         // ذخیره در کش
         cache = { data, time: Date.now() };
-
         res.json(data);
     } catch (err) {
         res.status(500).json({ error: err.message });
